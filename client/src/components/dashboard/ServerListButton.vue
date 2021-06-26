@@ -118,10 +118,9 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 .button {
   padding: 2px 8px;
-  background-color: var(--background-color);
   border-radius: 4px;
   box-sizing: border-box;
   border: 1px solid transparent;
@@ -133,14 +132,13 @@ export default {
   user-select: none;
 }
 .button:hover:not(.rogue) {
-  border: 1px solid var(--white);
-  background-color: var(--white);
+  @apply bg-gray-400 border border-gray-500;
 }
 .button:active {
   transform: translateY(-0px);
 }
 .button.router-link-active {
-  background-color: var(--white);
+  @apply bg-gray-400;
 }
 .button.rogue {
   background-color: var(--rogue-red);
@@ -293,7 +291,7 @@ export default {
   filter: invert(var(--filter));
 }
 .status {
-  background: linear-gradient(90deg, #8676ff 0%, #516dff 33.33%, #32b5ff 69.27%, #4adeff 100%);
+  background: linear-gradient(90deg, #8676ff 0%, #4221ee 34.9%, #6142ff 100%);
   background-clip: text;
   -webkit-text-fill-color: transparent;
   white-space: nowrap;

@@ -30,7 +30,13 @@ router.post("/datacenter/new", async (req, res) => {
   }
   try {
     const datacenter = await Datacenter.add(req.user.id, req.body.name);
+
+    // Create the datacenter on the user's database
     await req.user.addDatacenter(datacenter._id);
+
+    // If this is their first datacenter automatically make it their primary datacenter
+    if (!req.user.primaryDatacenter) await req.user.setPrimaryDatacenter(datacenter._id);
+
     res.status(201).json(datacenter);
   } catch (error) {
     if (error.code == 11000) {
@@ -56,8 +62,19 @@ router.get("/datacenter/all", async (req, res) => {
   res.status(200).json(datacenters);
 });
 
-router.get("/datacenter/:datacenterUUID?", datacenterAuth, async (req, res) => {
-  const datacenter = await Datacenter.findOne({ name: req.params.datacenterUUID, owner: req.user._id });
+router.delete("/datacenter/:datacenter", datacenterAuth, async (req, res) => {
+  // Find the datacenters ID and delete it from the user
+  let datacenter = await Datacenter.findOne({ _id: req.params.datacenter });
+  await req.user.removeDatacenter(datacenter._id);
+
+  // Delete the datacenter
+  await Datacenter.findOneAndDelete({ _id: req.params.datacenter });
+
+  res.status(200).json({ message: "Datacenter deleted" });
+});
+
+router.get("/datacenter/:datacenter?", datacenterAuth, async (req, res) => {
+  const datacenter = await Datacenter.findOne({ _id: req.params.datacenter });
   datacenter.owner == req.user;
   datacenter.members.map(async (member) => {
     const { username, profileImage, _id } = await User.findOne({ _id: member });
@@ -66,9 +83,9 @@ router.get("/datacenter/:datacenterUUID?", datacenterAuth, async (req, res) => {
   res.status(200).json(datacenter);
 });
 
-router.patch("/datacenter/:datacenterUUID?", datacenterAuth, async (req, res) => {
+router.patch("/datacenter/:datacenter?", datacenterAuth, async (req, res) => {
   if (req.files.length == 0) return res.status(403).json({ message: "no images provided" });
-  const datacenter = await Datacenter.findOne({ name: req.params.datacenterUUID });
+  const datacenter = await Datacenter.findOne({ _id: req.params.datacenter });
 
   try {
     for (file of req.files) {
@@ -93,13 +110,13 @@ router.patch("/datacenter/:datacenterUUID?", datacenterAuth, async (req, res) =>
   }
 });
 
-router.get("/datacenter/:datacenterUUID/machine/count", datacenterAuth, async (req, res) => {
-  const datacenter = await Datacenter.findOne({ name: req.params.datacenterUUID });
-  res.status(200).json({ count: datacenter.machines.length });
+router.get("/datacenter/:datacenter/machine/count", datacenterAuth, async (req, res) => {
+  const datacenter = await Datacenter.findOne({ _id: req.params.datacenter });
+  res.status(200).json({ count: datacenter.machines.length || 0 });
 });
 
-router.put("/datacenter/:datacenterUUID/machine/:machineUUID", datacenterAuth, async (req, res) => {
-  if (req.params.datacenterUUID === "undefined" || req.params.machineUUID === "undefined") {
+router.put("/datacenter/:datacenter/machine/:machineUUID", datacenterAuth, async (req, res) => {
+  if (req.params.datacenter === "undefined" || req.params.machineUUID === "undefined") {
     return res.status(403).json({ message: "Undefined field" });
   }
 
@@ -107,14 +124,14 @@ router.put("/datacenter/:datacenterUUID/machine/:machineUUID", datacenterAuth, a
     return res.status(403).json({ message: "That machine doesn't belong to you" });
   }
 
-  const query = await Datacenter.addMachine(req.params.datacenterUUID, req.params.machineUUID);
+  const query = await Datacenter.addMachine(req.params.datacenter, req.params.machineUUID);
   const machine = await Machine.findOne({ _id: req.params.machineUUID }).exec();
-  machine.datacenter = req.params.datacenterUUID;
+  machine.datacenter = req.params.datacenter;
   await machine.save();
   res.status(201).json(query);
 });
 
-router.delete("/datacenter/:datacenterUUID/machine/:machineUUID", datacenterAuth, async (req, res) => {
+router.delete("/datacenter/:datacenter/machine/:machineUUID", datacenterAuth, async (req, res) => {
   if (req.params.machineUUID === "undefined" || req.params.user === "undefined") {
     return res.status(403).json({ message: "Undefined field" });
   }
@@ -127,13 +144,28 @@ router.delete("/datacenter/:datacenterUUID/machine/:machineUUID", datacenterAuth
   res.status(201).json(query);
 });
 
-router.put("/datacenter/:datacenterUUID/user/:userUUID", datacenterAuth, async (req, res) => {
-  if (req.params.datacenterUUID === "undefined" || req.params.userUUID === "undefined") {
+router.put("/datacenter/:datacenter/user/:userUUID", datacenterAuth, async (req, res) => {
+  if (req.params.datacenter === "undefined" || req.params.userUUID === "undefined") {
+    return res.status(403).json({ message: "Undefined field" });
+  }
+
+  const user = await User.findOne({ _id: req.params.userUUID });
+
+  if (!user) {
+    return res.status(403).json({ message: "That user doesn't exist in the database" });
+  }
+
+  const query = await Datacenter.addUser(req.params.datacenter, req.params.userUUID);
+  res.status(201).json(query);
+});
+
+router.delete("/datacenter/:datacenter/user/:userUUID", datacenterAuth, async (req, res) => {
+  if (req.params.datacenter === "undefined" || req.params.userUUID === "undefined") {
     return res.status(403).json({ message: "Undefined field" });
   }
 
   if (req.params.userUUID === req.user._id) {
-    return res.status(403).json({ message: "You can not add yourself as a member idiot, you're the owner" });
+    return res.status(403).json({ message: "You can not remove yourself from your own datacenter idiot, you're the owner" });
   }
 
   const user = await User.findOne({ _id: req.params.userUUID });
@@ -142,23 +174,24 @@ router.put("/datacenter/:datacenterUUID/user/:userUUID", datacenterAuth, async (
     return res.status(403).json({ message: "That user doesn't exist in the database" });
   }
 
-  const query = await Datacenter.addUser(req.params.datacenterUUID, req.params.userUUID);
+  const query = await Datacenter.removeUser(req.params.datacenter, req.params.userUUID);
   res.status(201).json(query);
 });
 
-router.delete("/datacenter/:datacenterUUID/user/:userUUID", datacenterAuth, async (req, res) => {
+router.patch("/datacenter/primary/:datacenter", datacenterAuth, async (req, res) => {
   if (req.params.datacenterUUID === "undefined" || req.params.userUUID === "undefined") {
     return res.status(403).json({ message: "Undefined field" });
   }
 
-  const user = await User.findOne({ _id: req.params.userUUID });
+  // We do this step because if we change the user from
+  // Req.user and save it, it fucks up the database and adds
+  // The entire datacenter object in the datacenters
+  // Array on the user where they are supposed to be strings of UUIDs
+  let updatedUser = await User.findOne({ _id: req.user._id });
+  updatedUser = await updatedUser.setPrimaryDatacenter(req.params.datacenter);
+  delete updatedUser.password;
 
-  if (!user) {
-    return res.status(403).json({ message: "That user doesn't exist in the database" });
-  }
-
-  const query = await Datacenter.removeUser(req.params.datacenterUUID, req.params.userUUID);
-  res.status(201).json(query);
+  res.status(201).json({ message: "Datacenter set as primary", me: updatedUser });
 });
 
 module.exports = router;

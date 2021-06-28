@@ -2,12 +2,13 @@
   <router-link v-if="!addButton" class="datacenter" :to="{ name: 'datacenters', params: { name: datacenter.name } }">
     <div class="heading">
       <Icon icon="datacenter" />
-      <h1>{{ datacenter.name }}</h1>
+      <h1 class="whitespace-nowrap">{{ datacenter.name }}</h1>
     </div>
     <Icon v-if="!datacenter.logo" icon="datacenter" class="logo" />
     <img v-else class="logo" :src="datacenter.logo" :alt="datacenter.name" />
     <div class="footer">
-      <h1 v-if="datacenter.owner === me._id" class="primary">Primary</h1>
+      <h1 v-if="datacenter._id === me.primaryDatacenter" class="primary">Primary</h1>
+      <h1 v-if="datacenter.owner === me._id" class="owned">Owned</h1>
 
       <!-- <ColoredGauge icon="stack" color="#00FF67" :value="machines.size || 0" :maxValue="stats.totalMachines" /> -->
       <!-- <ColoredGauge icon="network" color="#FFA800"  :value="datacenter.networkHealth || 0" :maxValue="100" /> -->
@@ -27,6 +28,7 @@
 import Icon from "@/components/misc/Icon";
 import DatacenterButton from "@/components/dashboard/DatacenterButton";
 import ColoredGauge from "@/components/dashboard/ColoredGauge";
+import { appState } from "@/states/appState";
 export default {
   name: "DatacenterButton",
   components: {
@@ -38,31 +40,21 @@ export default {
     addButton: { type: Boolean }
   },
   computed: {
-    me: function() {
-      return JSON.parse(localStorage.getItem("me"));
+    me() {
+      return appState.getMe();
     }
   }
 };
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 .datacenter {
+  @apply rounded-8px border border-gray-500 bg-gray-300 cursor-pointer p-2 flex flex-col justify-between items-center transition duration-200 ease;
   aspect-ratio: 1;
-  max-height: 256px;
-  border-radius: 8px;
-  background-color: var(--background-color);
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  transition: 100ms ease;
-  border: 1px solid var(--border-color);
 }
 
 .datacenter:hover {
-  box-shadow: rgb(0 0 0 / 10%) 0px 10px 20px;
+  box-shadow: var(--shadowColor) 0px 10px 20px;
   transform: translateY(-1px);
   border: 1px solid var(--theme-color);
 }
@@ -104,14 +96,21 @@ export default {
   overflow: hidden;
 }
 
+.owned,
 .primary {
   padding: 2px 6px;
   background-color: #8171ff44;
   border-radius: 167px;
-  color: var(--theme-color) !important;
+  color: var(--theme-color);
   border: 1px solid var(--theme-color);
   font-weight: 600;
   text-transform: uppercase;
   font-size: 10px;
+}
+
+.primary {
+  color: var(--blue);
+  border: 1px solid var(--blue);
+  background-color: var(--blue-transparent);
 }
 </style>

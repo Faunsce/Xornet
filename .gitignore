@@ -2,3 +2,5 @@ experimental/
 client/vue.config.js
 reporter/settings.json
 reporter/speedtest.exe
+
+*.env

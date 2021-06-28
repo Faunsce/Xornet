@@ -12,7 +12,14 @@
         />
         <h1>{{ member.username }}</h1>
       </router-link>
-      <ShadowButton v-if="isOwner" colored class="revoke" title="Revoke" icon="hammer" @click="revoke(member._id)" />
+      <ShadowButton
+        v-if="isOwner && member._id !== me._id"
+        colored
+        class="revoke"
+        title="Revoke"
+        icon="hammer"
+        @click="revoke(member._id)"
+      />
     </div>
     <ShadowButton v-if="isOwner" title="Add" icon="add" @click="showMemberCard = !showMemberCard" />
     <MemberCard v-if="showMemberCard" />
@@ -22,12 +29,19 @@
 <script>
 import ShadowButton from "@/components/dashboard/ShadowButton";
 import MemberCard from "@/components/misc/MemberCard";
+import { appState } from "@/states/appState";
+
 export default {
   name: "MemberField",
   data() {
     return {
       showMemberCard: false
     };
+  },
+  computed: {
+    me() {
+      return appState.getMe();
+    }
   },
   props: {
     members: { type: Array, required: true },
@@ -39,25 +53,15 @@ export default {
   },
   methods: {
     async revoke(user) {
-      await this.api.datacenters.revokeMember(this.$route.params.name, user);
+      await this.api.datacenter.revokeMember(this.$route.params.name, user);
     }
   }
 };
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 .membersInfo {
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  flex-direction: column;
-  text-align: left;
-  gap: 8px;
-  width: 100%;
-  color: var(--black);
-  padding: 16px;
-  cursor: pointer;
-  background-color: var(--background-color);
-  transition: 100ms ease;
+  @apply border border-gray-500 rounded-4px flex-col text-left gap-2 p-4 cursor-pointer w-full;
 }
 
 img {

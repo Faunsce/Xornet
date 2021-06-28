@@ -1,11 +1,11 @@
 <template>
   <transition name="bounce">
     <div class="popup" v-if="show">
-      <div class="content">
+      <div class="content" :class="{ type }">
         <progress class="progressBar" :value="timeoutProgress" :max="timeoutLength / 1000"></progress>
         <div class="shit">
           <p>
-            <strong>{{ errorMethod }}</strong> - {{ errorMessage }}
+            <strong>{{ apiMethod }}</strong> - {{ apiMessage }}
           </p>
           <Icon icon="x" class="xButton" @click="show = !show" />
         </div>
@@ -26,21 +26,34 @@ export default {
   data() {
     return {
       show: false,
-      errorMessage: "null",
-      errorMethod: "null",
+      apiMessage: "null",
+      apiMethod: "null",
       timeoutProgress: 0,
-      timeoutLength: 10000
+      timeoutLength: 10000,
+      type: "error"
     };
   },
   async mounted() {
     let sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    eventHandler.on("error", async error => {
-      this.timeoutProgress = 0;
-      this.timeoutLength = 10000;
-      this.show = true;
-      this.errorMessage = error.messages[0].response.data.message;
-      this.errorMethod = `${error.messages[0].response.status} ${error.method}`;
+    eventHandler.on("show", async params => {
+      this.type = params.type;
+      switch (params.type) {
+        case "ok":
+          this.timeoutProgress = 0;
+          this.timeoutLength = 5000;
+          this.show = true;
+          this.apiMethod = `${params.method}`;
+          this.apiMessage = "Success";
+          break;
+        default:
+          this.timeoutProgress = 0;
+          this.timeoutLength = 10000;
+          this.show = true;
+          this.apiMessage = params.messages[0].response.data.message;
+          this.apiMethod = `${params.messages[0].response.status} ${params.method}`;
+          break;
+      }
 
       for (let i = 0; i < this.timeoutLength / 1000; i++) {
         this.timeoutProgress++;
@@ -72,7 +85,7 @@ export default {
 
 .content {
   background-color: var(--theme-color);
-  box-shadow: rgb(0 0 0 / 10%) 0px 10px 20px;
+  box-shadow: var(--shadowColor) 0px 10px 20px;
   color: white;
 
   position: relative;
@@ -86,6 +99,18 @@ export default {
   border-radius: 0px 0px 4px 4px;
   width: 75%;
   height: 100%;
+}
+
+.content.ok {
+  background-color: green;
+}
+
+.content.warn {
+  background-color: orange;
+}
+
+.content.error {
+  background-color: red;
 }
 
 .progressBar {

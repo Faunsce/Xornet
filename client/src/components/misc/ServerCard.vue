@@ -37,7 +37,7 @@ export default {
     };
   },
   computed: {
-    isFormValid: function() {
+    isFormValid() {
       const uuidRegex = /([0-9a-f]{16})|([0-9a-f]{32})/g;
       return Object.values(this.form).some(field => !uuidRegex.test(field.toLowerCase()));
     }
@@ -46,7 +46,7 @@ export default {
     async add() {
       this.isLoading = true;
       try {
-        const status = await this.api.datacenters.addMachine(this.$route.params.name, this.form.uuid);
+        const status = await this.api.datacenter.addMachine(this.$route.params.name, this.form.uuid);
         if (status == 200) {
           console.log("added");
         }

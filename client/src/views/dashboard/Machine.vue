@@ -43,13 +43,13 @@
           <ShadowButton icon="clipboard" :title="machine.uuid" allowCopy />
         </div>
 
-        <!-- <Tooltip flipped text="Restart Machine">
-          <ShadowButton icon="restart"/>
+        <Tooltip v-if="me.machines.includes(machine.uuid)" text="Restart Machine">
+          <ShadowButton icon="restart" @click="api.machine.restart(machine.uuid)" />
         </Tooltip>
-        <Tooltip flipped text="Shutdown Machine">
-          <ShadowButton icon="shutdown"/>
-        </Tooltip> -->
-        <Tooltip flipped text="Trash Machine">
+        <Tooltip v-if="me.machines.includes(machine.uuid)" text="Shutdown Machine">
+          <ShadowButton icon="shutdown" @click="api.machine.shutdown(machine.uuid)" />
+        </Tooltip>
+        <Tooltip text="Trash Machine">
           <ShadowButton icon="trash" />
         </Tooltip>
       </div>
@@ -68,7 +68,6 @@
         process 
         cursor-pointer 
         border 
-        border-transparent 
         rounded-4px 
         px-1 
         py-0.5 
@@ -110,30 +109,22 @@ import ShadowButton from "@/components/dashboard/ShadowButton";
 import socket from "@/services/socket.js";
 import InfoField from "@/components/dashboard/InfoField";
 import Tooltip from "@/components/dashboard/Tooltip";
+import { appState } from "@/states/appState";
 export default {
   name: "Machine",
-  data() {
-    return {
-      machine: null,
-      processes: null
-    };
-  },
   components: {
     ShadowButton,
     Icon,
     InfoField,
     Tooltip
   },
+  data() {
+    return {
+      processList: []
+    };
+  },
   async created() {
-    socket.off("machines");
-    socket.on("machines", machines => {
-      this.machine = Object.values(machines).filter(machine => machine.uuid == this.$route.params.machine)[0];
-    });
-    socket.emit("getMachines");
-
-    this.processes = (await this.api.machine.getProcesses(this.$route.params.machine)).list.sort((a, b) =>
-      a.name < b.name ? 1 : -1
-    );
+    this.processList = (await this.api.machine.getProcesses(this.$route.params.machine)).list;
   },
   methods: {
     sort(by) {
@@ -141,8 +132,17 @@ export default {
     }
   },
   computed: {
-    type: function() {
+    machine() {
+      return appState.getMachines().get(this.$route.params.machine);
+    },
+    processes() {
+      return this.processList.sort((a, b) => (a.name < b.name ? 1 : -1));
+    },
+    type() {
       return this.machine.isVirtual ? "slave" : "master";
+    },
+    me() {
+      return appState.getMe();
     }
   }
 };
@@ -157,6 +157,10 @@ export default {
 
 .processList .header h1 {
   @apply uppercase font-medium;
+}
+
+.process {
+  border: 1px solid var(--background-color);
 }
 
 .process:hover {

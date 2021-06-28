@@ -7,7 +7,7 @@ const Stats = require("@/models/Stats.js");
 const authSocket = require("@/middleware/authSocket.js");
 io.use(authSocket);
 
-let latestVersion = "0.0.21";
+let latestVersion = "0.0.24";
 
 const SPEEDTEST_BASE_REWARD = 30;
 const REPORT_BASE_REWARD = 5;
@@ -26,10 +26,10 @@ let machines = new Map();
 let machinesPings = new Map();
 let machinesStatic = new Map();
 
-// // Temp clear out machines every 60seconds to clear
-// setInterval(() => {
-//   machines.clear();
-// }, 60000);
+// Temp clear out machines every 60seconds to clear
+setInterval(() => {
+  machines.clear();
+}, 60000);
 
 // Log amount of sockets connected every minute
 setInterval(() => {
@@ -41,9 +41,52 @@ setInterval(() => io.sockets.in("reporter").emit("runSpeedtest"), 3600000 * 8);
 // setTimeout(() => io.sockets.in("reporter").emit("runSpeedtest"), 10000);
 // setInterval(() => io.sockets.in("reporter").emit("restart"), 10000);
 
+// Gets all the active machines for a client
+// Certainly can be improved performance wise
+async function getClientActiveMachines(client) {
+  if (!client) return;
+  let userMachines = new Map();
+  const user = await User.findOne({ _id: client.split("client-")[1] });
+
+  if (user.is_admin) return Object.fromEntries(machines);
+
+  for (machine of user.machines) {
+    userMachines.set(machine, machines.get(machine));
+  }
+
+  const sharedDatacenters = await Datacenter.find({ members: user._id });
+  const sharedMachines = [].concat.apply(
+    [],
+    sharedDatacenters.map((datacenter) => datacenter.machines)
+  );
+
+  for (machine of sharedMachines) {
+    const onlineMachine = machines.get(machine);
+    if (onlineMachine) userMachines.set(machine, onlineMachine);
+  }
+
+  return Object.fromEntries(userMachines);
+}
+
+// Emits to all the clients
+async function emitToClients() {
+  let allSockets = Array.from(io.sockets.adapter.rooms.keys());
+  let clients = allSockets.filter((socket) => socket.startsWith("client-"));
+
+  for (client of clients) {
+    io.sockets.in(client).emit("machines", await getClientActiveMachines(client));
+  }
+}
+
+async function emitMachinesToClient(socket) {
+  let machines = await getClientActiveMachines(Array.from(socket.rooms).pop());
+  socket.emit("machines", machines);
+}
+
 // Temp clear out machines every 60seconds to clear
 setInterval(async () => {
-  io.sockets.in("client").emit("machines", Object.fromEntries(machines));
+  // Emit to all clients
+  emitToClients();
   io.sockets.in("reporter").emit("heartbeat", Date.now());
 }, 1000);
 
@@ -53,9 +96,16 @@ io.on("connection", async (socket) => {
   console.log(`[WEBSOCKET] ${socket.handshake.auth.type} connected`);
 
   if (socket.handshake.auth.type === "client") {
+    if (!socket.user) return;
+
+    // General room for all clients to emit to if needed
     socket.join("client");
-    socket.emit("machines", Object.fromEntries(machines));
-    socket.on("getMachines", () => socket.emit("machines", Object.fromEntries(machines)));
+
+    // Unique client rooms
+    socket.join(`client-${socket.user._id}`);
+
+    await emitMachinesToClient(socket);
+    socket.on("getMachines", async () => await emitMachinesToClient(socket));
 
     socket.on("getPoints", (username) => {
       userToGetPointsOf = username;
@@ -70,7 +120,11 @@ io.on("connection", async (socket) => {
   }
   if (socket.handshake.auth.type === "reporter" && socket.handshake.auth.uuid !== "") {
     await Machine.add(socket.handshake.auth.static);
+
+    // General reporter room for Heartbeat / pings
     socket.join("reporter");
+
+    // Unique reporter room
     socket.join(`reporter-${socket.handshake.auth.uuid}`);
 
     // Calculate ping and append it to the machine map

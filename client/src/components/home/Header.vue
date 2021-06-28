@@ -8,6 +8,10 @@
         <Icon icon="details" />
         <p>What is Xornet</p>
       </router-link>
+      <router-link class="button" :to="{ name: 'privacy' }">
+        <Icon icon="lock" />
+        <p>Privacy</p>
+      </router-link>
       <a class="button" href="https://github.com/Geoxor/Xornet" target="_blank">
         <Icon icon="repository" />
         <p>Repository</p>
@@ -36,10 +40,10 @@ export default {
     Icon
   },
   computed: {
-    isLoggedIn: function() {
+    isLoggedIn() {
       return localStorage.getItem("token") == null ? false : true;
     },
-    route: function() {
+    route() {
       return this.$route.name;
     }
   }

@@ -1,45 +1,39 @@
 <template>
-  <div class="machines">
-    <ServerList :machines="machineArray" />
-    <!-- <div class="content">
-      <div class="machines">
-
-        <Chart
-          v-if="uploadGraph.length != 0"
-          :key="labels[2]"
-          :identity="labels[2]"
-          :type="'line'"
-          :data="{
-            labels: labels,
-            datasets: [
-              {
-                label: 'Download',
-                data: downloadGraph,
-                borderColor: '#00c8ff',
-                backgroundColor: '#52daffaa'
-              }
-            ]
-          }"
-        />
-        <Chart
-          v-if="uploadGraph.length != 0"
-          :key="labels[2] + 'up'"
-          :identity="labels[2] + 'up'"
-          :type="'line'"
-          :data="{
-            labels: labels,
-            datasets: [
-              {
-                label: 'Upload',
-                data: uploadGraph,
-                borderColor: '#ff0062',
-                backgroundColor: '#ff458caa'
-              }
-            ]
-          }"
-        />
+  <div class="machines flex flex-col gap-4 p-6 w-full h-100vh mb-128px">
+    <div class="flex items-center gap-4">
+      <h1 class="text-32px font-semibold text-white">Machines</h1>
+      <input
+        type="text"
+        v-model="filter"
+        placeholder="Filter machines"
+        class="text-11px font-semibold placeholder-alpha-50 outline-none p-2 bg-gray-500 rounded-4px"
+      />
+      <div class="buttons flex gap-2">
+        <Tooltip text="Windows Machines">
+          <div class="filterButton" @click="tags.windows = !tags.windows" :class="{ enabled: tags.windows }">Windows</div>
+        </Tooltip>
+        <Tooltip text="Linux Machines">
+          <div class="filterButton" @click="tags.linux = !tags.linux" :class="{ enabled: tags.linux }">Linux</div>
+        </Tooltip>
+        <Tooltip text="Darwin Machines">
+          <div class="filterButton" @click="tags.macos = !tags.macos" :class="{ enabled: tags.macos }">MacOS</div>
+        </Tooltip>
+        <Tooltip text=">50% CPU">
+          <div class="filterButton" @click="tags.cpu = !tags.cpu" :class="{ enabled: tags.cpu }">High CPU Usage</div>
+        </Tooltip>
+        <Tooltip text=">70% RAM">
+          <div class="filterButton" @click="tags.ram = !tags.ram" :class="{ enabled: tags.ram }">High RAM Usage</div>
+        </Tooltip>
+        <Tooltip text=">100Mbps Traffic">
+          <div class="filterButton" @click="tags.network = !tags.network" :class="{ enabled: tags.network }">High Network</div>
+        </Tooltip>
+        <Tooltip text=">150ms Ping">
+          <div class="filterButton" @click="tags.ping = !tags.ping" :class="{ enabled: tags.ping }">High Ping</div>
+        </Tooltip>
       </div>
-    </div> -->
+    </div>
+    <div class="w-full h-1px bg-gray-500"></div>
+    <ServerList :machines="taggedMachines" />
   </div>
 </template>
 
@@ -51,7 +45,8 @@ import Chart from "@/components/dashboard/Chart";
 import Terminal from "@/components/dashboard/Terminal";
 import Header from "@/components/dashboard/Header";
 import Nav from "@/components/dashboard/Nav";
-
+import Tooltip from "@/components/dashboard/Tooltip";
+import { appState } from "@/states/appState";
 export default {
   name: "Machines",
   components: {
@@ -60,23 +55,47 @@ export default {
     Header,
     Chart,
     LoadingScreen,
+    Tooltip,
     ServerList
   },
-  computed: {
-    selectedMachine: function() {
-      return this.$route.params.machine;
-    },
-    machineArray: function() {
-      return Array.from(this.machines.values());
-    }
-  },
-  data: () => {
+  data() {
     return {
-      machines: new Map(),
+      tags: {
+        windows: false,
+        linux: false,
+        macos: false,
+        cpu: false,
+        ram: false,
+        network: false,
+        ping: false
+      },
+      machines: appState.getMachines(),
       downloadGraph: [],
+      filter: "",
       uploadGraph: [],
       labels: []
     };
+  },
+  computed: {
+    taggedMachines() {
+      if (!Object.values(this.tags).some(tag => tag == true)) return this.machineArray;
+      return this.machineArray.filter(machine => {
+        if (this.tags.windows && machine.platform == "win32") return machine;
+        if (this.tags.linux && machine.platform == "linux") return machine;
+        if (this.tags.macos && machine.platform == "darwin") return machine;
+        if (this.tags.cpu && machine.cpu >= 50) return machine;
+        if (this.tags.ram && 100 - (100 * machine.ram.used) / machine.ram.total < 30) return machine;
+        if (this.tags.network && machine.network.TxSec + machine.network.RxSec > 100) return machine;
+        if (this.tags.ping && machine.ping > 150) return machine;
+      });
+    },
+    selectedMachine() {
+      return this.$route.params.machine;
+    },
+    machineArray() {
+      const allMachines = Array.from(this.machines.values());
+      return this.filter !== "" ? allMachines.filter(machine => machine.hostname.startsWith(this.filter)) : allMachines;
+    }
   },
   methods: {
     async getNetwork() {
@@ -98,32 +117,30 @@ export default {
     if (this.$route.query.newMachine) {
       this.api.user.addMachine(this.$route.query.newMachine);
     }
-
     if (this.selectedMachine) this.getNetwork();
-
-    socket.off("machines");
-    socket.on("machines", machines => {
-      console.log(
-        `%c[WS]` + `%c [Machines]`,
-        "color: black; background-color: #ff4488; padding: 2px; border-radius: 4px; font-weight: bold;",
-        "color: #ff77aa;",
-        machines
-      );
-
-      Object.values(machines).forEach(machine => (machine.uuid ? this.machines.set(machine.uuid, machine) : null));
-
-      // this.labels.push(`${new Date().getHours()}:${new Date().getMinutes()}`);
-    });
-    socket.emit("getMachines");
   }
 };
 </script>
 
-<style scoped>
-.machines {
-  width: 100%;
-  height: 100vh;
-  margin-bottom: 128px;
-  padding: 8px;
+<style lang="postcss" scoped>
+.filterButton {
+  @apply cursor-pointer 
+  select-none 
+  text-11px 
+  font-semibold 
+  rounded-full 
+  whitespace-nowrap 
+  bg-gray-500 
+  px-2 
+  py-1.5
+  border 
+  border-gray-600 
+  text-gray-600 
+  hover:border-white 
+  hover:text-white;
+}
+
+.filterButton.enabled {
+  @apply bg-primary-100 border border-primary-300 text-primary-400;
 }
 </style>

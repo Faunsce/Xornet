@@ -28,6 +28,7 @@
 import Icon from "@/components/misc/Icon";
 import DatacenterButton from "@/components/dashboard/DatacenterButton";
 import ColoredGauge from "@/components/dashboard/ColoredGauge";
+import { appState } from "@/states/appState";
 export default {
   name: "DatacenterButton",
   components: {
@@ -40,7 +41,7 @@ export default {
   },
   computed: {
     me() {
-      return JSON.parse(localStorage.getItem("me"));
+      return appState.getMe();
     }
   }
 };

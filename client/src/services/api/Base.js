@@ -1,4 +1,6 @@
 import axios from "axios";
+import eventHandler from "@/services/eventHandler";
+import { appState } from "@/states/appState";
 let ROOT_PATH = "https://backend.xornet.cloud";
 
 /**
@@ -109,6 +111,7 @@ export default class Base {
    */
   updateLocalStorage(userObject) {
     localStorage.setItem("me", JSON.stringify(userObject));
+    appState.setMe(userObject);
   }
 
   /**

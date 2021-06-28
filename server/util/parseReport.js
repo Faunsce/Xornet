@@ -24,11 +24,16 @@ function parseReport(report, latestVersion, machinesPings) {
   } catch (error) {
     report.rogue = true;
 
-    Logs.add("Report parser", "Got invalid Report from reporter", {
-      error: error.message,
-      stack: error.stack,
-      report,
-    });
+    Logs.add(
+      "Report parser",
+      "Got invalid Report from reporter",
+      {
+        error: error.message,
+        stack: error.stack,
+        report,
+      },
+      report.linked_account
+    );
 
     // // Log this in the database
     // if (!process.env.TESTING === "true")
@@ -97,6 +102,8 @@ function parse(report, machinesPings) {
 
   // Parse disks
   report.disks = report.disks?.map((disk) => {
+    disk.mount = disk.mount.replace("\\", "");
+    disk.fs = disk.fs.replace("\\", "");
     disk.size = parseFloat((disk.size / 1024 / 1024 / 1024).toFixed(2));
     disk.used = parseFloat((disk.used / 1024 / 1024 / 1024).toFixed(2));
     disk.available = parseFloat((disk.available / 1024 / 1024 / 1024).toFixed(2));

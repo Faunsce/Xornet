@@ -1,5 +1,8 @@
 <template>
-  <router-link class="searchResult" :to="{ name: 'profile', params: { username: user.username } }">
+  <router-link
+    class="searchResult flex flex-row items-center p-2 rounded justify-between gap-2 text-left"
+    :to="{ name: 'profile', params: { username: user.username } }"
+  >
     <div class="profile">
       <img
         class="profileImg"
@@ -26,7 +29,7 @@
         </div>
       </div>
     </div>
-    <div class="userPoints">
+    <div class="userPoints flex flex-col gap-3 text-right">
       <p class="p">Points</p>
       <p class="points">{{ ~~user.points }}</p>
     </div>
@@ -48,28 +51,10 @@ export default {
 </script>
 
 <style scoped>
-.searchResult {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 8px;
-  border-radius: 4px;
-  justify-content: space-between;
-  gap: 8px;
-  text-align: left;
-}
-
 .searchResult:hover {
   /* Shadow */
   background-color: var(--white);
   box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.1);
-}
-
-.userPoints {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  text-align: right;
 }
 
 .userPoints .p {
@@ -86,7 +71,7 @@ export default {
 }
 
 .points {
-  background: linear-gradient(90deg, #8676ff 0%, #516dff 33.33%, #32b5ff 69.27%, #4adeff 100%);
+  background: linear-gradient(90deg, #8676ff 0%, #4221ee 34.9%, #6142ff 100%);
   background-clip: border-box;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

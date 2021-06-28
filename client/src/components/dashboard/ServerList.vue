@@ -70,10 +70,10 @@ import Icon from "@/components/misc/Icon";
 export default {
   name: "ServerList",
   computed: {
-    isSmall: function() {
+    isSmall() {
       return this.$route.params.machine ? true : false;
     },
-    settings: function() {
+    settings() {
       if (localStorage.settings) return JSON.parse(localStorage.settings);
     }
   },
@@ -194,8 +194,7 @@ export default {
   height: 100%;
   flex-direction: column;
   font-family: "Roboto Mono";
-  background-color: var(--background-color);
-  transition: 200ms ease;
+  transition: width 200ms ease;
   overflow-x: hidden;
 }
 .serverList.small {
@@ -239,14 +238,11 @@ section h1 {
 }
 .columns {
   padding: 8px;
-  background-color: var(--background-color);
   border-radius: 4px;
   box-sizing: border-box;
   border: 1px solid transparent;
   display: flex;
   gap: 8px;
-  transition: 100ms ease;
-
   overflow: hidden;
   user-select: none;
 }

@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import auth from "@/router/middleware/auth.js";
 
 const routes = [
-  // Xornet Home Page
   {
     path: "/:info?",
     name: "home",
@@ -11,7 +10,6 @@ const routes = [
       title: "Xornet | Home"
     }
   },
-  // Xornet Login
   {
     path: "/login",
     name: "login",
@@ -21,7 +19,6 @@ const routes = [
       guest: true
     }
   },
-  // Xornet Signup
   {
     path: "/signup",
     name: "signup",
@@ -31,7 +28,6 @@ const routes = [
       guest: true
     }
   },
-  // Xornet Signup
   {
     path: "/downloads",
     name: "downloads",
@@ -40,7 +36,14 @@ const routes = [
       title: "Xornet | Downloads"
     }
   },
-  // Xornet Dashboard
+  {
+    path: "/privacy",
+    name: "privacy",
+    component: () => import(/* webpackChunkName: "privacy" */ "@/views/home/Privacy.vue"),
+    meta: {
+      title: "Xornet | Privacy"
+    }
+  },
   {
     path: "/dashboard",
     name: "dashboard",
@@ -50,15 +53,6 @@ const routes = [
       requiresAuth: true
     },
     children: [
-      {
-        path: "summary",
-        name: "summary",
-        component: () => import(/* webpackChunkName: "summary" */ "@/views/dashboard/Summary.vue"),
-        meta: {
-          title: "Xornet | Summary"
-        }
-      },
-      // Xornet Signup
       {
         path: "datacenters/:name?",
         name: "datacenters",
@@ -74,14 +68,6 @@ const routes = [
         component: () => import(/* webpackChunkName: "logs" */ "@/views/dashboard/Logs.vue"),
         meta: {
           title: "Xornet | Logs"
-        }
-      },
-      {
-        path: "network",
-        name: "network",
-        component: () => import(/* webpackChunkName: "network" */ "@/views/dashboard/Network.vue"),
-        meta: {
-          title: "Xornet | Network"
         }
       },
       {

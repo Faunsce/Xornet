@@ -1,35 +1,52 @@
 <template>
-  <nav class="buttons">
+  <nav class="buttons bg-gray-200 h-full max-w-min items-center flex flex-col content-between relative">
     <div class="top">
-      <SquareButton boxless class="firstButton" icon="user" :to="{ name: 'profile', params: { username } }" />
-      <!-- <SquareButton icon="dashboard" :to="{ name: 'summary' }" /> -->
-      <SquareButton boxless icon="stack" :to="{ name: 'machines' }" />
-      <SquareButton boxless icon="datacenter" :to="{ name: 'datacenters' }" />
-      <!-- <SquareButton icon="network" :to="{ name: 'network' }" /> -->
-      <SquareButton boxless icon="clipboard" :to="{ name: 'logs' }" />
-      <SquareButton boxless icon="downloads" :to="{ name: 'downloads' }" />
-      <SquareButton boxless class="settings" icon="settings" :to="{ name: 'settings' }" />
+      <Tooltip sideways text="Profile">
+        <SquareButton boxless class="firstButton" icon="user" :to="{ name: 'profile', params: { username } }" />
+      </Tooltip>
+      
+      <Tooltip sideways text="Machines">
+        <SquareButton boxless icon="stack" :to="{ name: 'machines' }" />
+      </Tooltip>
+      
+      <Tooltip sideways text="Datacenters">
+        <SquareButton boxless icon="datacenter" :to="{ name: 'datacenters' }" />
+      </Tooltip>
+      
+      <Tooltip sideways text="Logs">
+        <SquareButton boxless icon="clipboard" :to="{ name: 'logs' }" />
+      </Tooltip>
+      
+      <Tooltip sideways text="Downloads">
+        <SquareButton boxless icon="downloads" :to="{ name: 'downloads' }" />
+      </Tooltip>
+      
+      <Tooltip sideways text="Settings">
+        <SquareButton boxless class="settings" icon="settings" :to="{ name: 'settings' }" />
+      </Tooltip>
     </div>
   </nav>
 </template>
 
 <script>
 import SquareButton from "@/components/dashboard/SquareButton";
+import Tooltip from "@/components/dashboard/Tooltip.vue";
 
 export default {
   name: "MobileNav",
   components: {
-    SquareButton
+    SquareButton,
+    Tooltip
   },
   computed: {
-    username: function() {
+    username() {
       return localStorage.getItem("username");
     }
   }
 };
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 @media only screen and (max-width: 600px) {
   nav#desktopNav {
     display: none;
@@ -49,19 +66,7 @@ export default {
   }
 }
 
-nav {
-  height: 48px;
-  display: none;
-  align-items: center;
-  display: flex;
-  background-color: var(--background-color);
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-}
-
 nav:not(#mobileNav) .top .firstButton {
-  border-radius: 0px 8px 0px 0px;
   overflow: hidden;
 }
 

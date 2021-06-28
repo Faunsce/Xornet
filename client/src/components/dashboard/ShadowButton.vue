@@ -1,6 +1,6 @@
 <template>
   <div
-    class="shadowButton"
+    class="shadowButton py-1.5 px-2.5 flex items-center h-min border border-alpha-0 select-none cursor-pointer justify-between gap-2 flex-row rounded-full duration-100 bg-gray-400"
     :id="allowCopy ? 'shadowButton' : null"
     :class="{ colored, didCopy, iconOnly: !title, tiny }"
     @click="allowCopy ? copyText() : null"
@@ -56,28 +56,12 @@ export default {
 };
 </script>
 
-<style>
-.shadowButton {
-  padding: 8px 12px;
-  display: flex;
-  align-items: center;
-  height: fit-content;
-  user-select: none;
-  cursor: pointer;
-  justify-content: space-between;
-
-  gap: 8px;
-  flex-direction: row;
-  border-radius: 200px;
-  transition: all 100ms;
-  background-color: var(--shadowButton-color);
-}
-
+<style lang="postcss" scoped>
 .shadowButton:not(.tiny) {
   box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.1);
 }
 
-.shadowButton:not(.colored):not(.didCopy):hover {
+.shadowButton:not(.colored):not(.didCopy):not(.primary):not(.delete):hover {
   filter: invert(1);
 }
 
@@ -130,5 +114,18 @@ export default {
 
 .shadowButton.tiny img {
   width: 16px;
+}
+
+.shadowButton.primary {
+  color: var(--blue);
+  border: 1px solid var(--blue);
+  background-color: var(--blue-transparent);
+  cursor: not-allowed;
+}
+
+.shadowButton.delete {
+  color: #d00000;
+  border: 1px solid #d00000;
+  background-color: #d0000044;
 }
 </style>

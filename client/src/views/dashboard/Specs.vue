@@ -103,28 +103,28 @@ export default {
   text-align: left;
 }
 
-h1 {
+.specs h1 {
   font-size: 35px;
 }
 
-h2 {
+.specs h2 {
   text-transform: uppercase;
   font-size: 25px;
 }
 
-h3 {
+.specs h3 {
   font-size: 16px;
   text-transform: capitalize;
 }
 
-strong {
+.specs strong {
   opacity: 35%;
   font-weight: 500;
   text-transform: capitalize;
 }
 
 .specs .title {
-  background: linear-gradient(90deg, #8676ff 0%, #516dff 33.33%, #32b5ff 69.27%, #4adeff 100%);
+  background: linear-gradient(90deg, #8676ff 0%, #4221ee 34.9%, #6142ff 100%);
   background-clip: border-box;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

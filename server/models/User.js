@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const saltRounds = parseInt(process.env.SALTROUNDS);
 const Machine = require("@/models/Machine.js");
 const Stats = require("@/models/Stats.js");
+const Datacenter = require("@/models/Datacenter.js");
 
 const schema = new Schema(
   {
@@ -26,6 +27,7 @@ const schema = new Schema(
     is_admin: { type: Boolean, default: false }, // Is user administrator or not
     machines: { type: Array, default: null }, // The array that contains the UUID's of the machines the user has
     datacenters: { type: Array, default: null }, // A list of the user's owned datacenters
+    primaryDatacenter: { type: String, default: null }, // The users current primary datacenter
   },
   {
     versionKey: false, // You should be aware of the outcome after set to false
@@ -91,6 +93,8 @@ schema.statics.update = async function (_id, newProfile) {
 schema.statics.addMachine = async function (_id, machineUUID) {
   return new Promise(async (resolve) => {
     const user = await this.findOne({ _id }).exec();
+    const datacenter = await Datacenter.findOne({ _id: user.primaryDatacenter });
+    await Datacenter.addMachine(datacenter._id, machineUUID);
     if (machineUUID != null) {
       if (!user.machines.includes(machineUUID)) user.machines.push(machineUUID);
       resolve(user.save());
@@ -100,7 +104,6 @@ schema.statics.addMachine = async function (_id, machineUUID) {
 
 /**
  * Simply adds a datacenter to the user's database
- * @param {String} [_id] the uuid of the user
  * @param {String} [datacenterUUID] the uuid of the datacenter to add to the user
  */
 schema.methods.addDatacenter = async function (datacenterUUID) {
@@ -113,11 +116,31 @@ schema.methods.addDatacenter = async function (datacenterUUID) {
 };
 
 /**
+ * Simply removes a datacenter to the user's database
+ * @param {String} [datacenterUUID] the uuid of the datacenter to add to the user
+ */
+schema.methods.removeDatacenter = async function (datacenterUUID) {
+  return new Promise(async (resolve, reject) => {
+    if (!datacenterUUID) reject();
+
+    this.datacenters.splice(this.datacenters.indexOf(datacenterUUID), 1);
+
+    // If they deleted their primary DC reset it to null
+    if (this.primaryDatacenter === datacenterUUID || this.datacenters.length == 0) {
+      this.primaryDatacenter = null;
+    }
+
+    await this.save();
+    resolve();
+  });
+};
+
+/**
  * @returns The user's total RAM throughout all of their machines
  */
 schema.methods.getTotalRam = async function () {
   // Replace the array with a new one that sums up all the ram for each machine
-  let totalRam = (await Machine.find({ _id: this.machines })).map((machine) => machine.static.memLayout.reduce((a, b) => a + b.size, 0));
+  let totalRam = (await Machine.find({ _id: this.machines })).map((machine) => machine.static?.memLayout?.reduce((a, b) => a + b.size, 0));
 
   // Sum up all the ram together and return
   return totalRam.reduce((a, b) => a + b, 0);
@@ -128,10 +151,18 @@ schema.methods.getTotalRam = async function () {
  */
 schema.methods.getTotalCores = async function () {
   // Replace the array with a new one that sums up all the ram for each machine
-  let totalRam = (await Machine.find({ _id: this.machines })).map((machine) => machine.static.cpu.cores);
+  let totalRam = (await Machine.find({ _id: this.machines })).map((machine) => machine.static?.cpu?.cores);
 
   // Sum up all the ram together and return
   return totalRam.reduce((a, b) => a + b, 0);
+};
+
+/**
+ * Sets a user's primary datacenter
+ */
+schema.methods.setPrimaryDatacenter = async function (datacenterUUID) {
+  this.primaryDatacenter = datacenterUUID;
+  return await this.save();
 };
 
 /**

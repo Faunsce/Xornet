@@ -42,8 +42,11 @@ export default {
     async add() {
       this.isLoading = true;
       try {
-        const response = await this.api.datacenters.add(JSON.stringify(this.form));
-        if (response.status == 201) this.$router.push(`/dashboard/datacenters/${this.form.name}`);
+        const response = await this.api.datacenter.add(JSON.stringify(this.form));
+        if (response.status == 201) {
+          await this.api.user.syncMe();
+          this.$router.push(`/dashboard/datacenters/${this.form.name}`);
+        }
       } catch (error) {
         console.log(error);
       }

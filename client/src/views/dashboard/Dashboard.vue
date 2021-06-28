@@ -1,5 +1,5 @@
 <template>
-  <div class="view dashboard">
+  <div class="view bg-gray-300 dashboard flex items-start flex-col h-100vh">
     <LoadingScreen :isLoaded="!isLoading" />
     <Header v-if="!isLoading" />
     <div class="main">
@@ -26,25 +26,16 @@ export default {
     LoadingScreen
   },
   computed: {
-    isLoading: function() {
+    isLoading() {
       return false;
     }
   }
 };
 </script>
 
-<style scoped>
-.dashboard {
-  align-items: flex-start;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
+<style lang="postcss" scoped>
 .main {
-  align-items: flex-start;
-  display: flex;
-  width: 100%;
+  @apply flex items-start w-full;
   height: calc(100vh - 48px);
 }
 
@@ -52,29 +43,5 @@ export default {
   .main {
     height: calc(100vh - 96px);
   }
-}
-
-.content {
-  box-sizing: border-box;
-  background-color: var(--white);
-  padding: 8px;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow: scroll;
-  border-radius: 4px 0px 0px 0px;
-}
-
-.machines,
-.informatics {
-  display: flex;
-  width: fit-content;
-  flex-direction: row;
-}
-
-.informatics {
-  gap: 8px;
 }
 </style>

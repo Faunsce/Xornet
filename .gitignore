@@ -4,3 +4,4 @@ reporter/settings.json
 reporter/speedtest.exe
 
 *.env
+client/vue.config.js

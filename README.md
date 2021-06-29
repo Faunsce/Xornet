@@ -23,15 +23,8 @@ https://discord.gg/geoxor
 Make sure you have Node.js v14+
   1. Client: 
      1. `npm i` to install dependancies
-     2. Comment out these lines in vue.config.js
-        ```js
-        // public: "https://xornet.cloud",
-        // https: true,
-        // cert: fs.readFileSync("./cert.pem"),
-        // key: fs.readFileSync("./key.pem")
-        ```
-     3. `npm run serve` to run the client
-     4. Use firefox because chrome doesn't like storing cookies in localhost
+     2. `npm run serve` to run the client
+     3. Use firefox because chrome doesn't like storing cookies in localhost
   2. Reporter: 
      1. `npm i` to install dependancies
      2. `nodemon .` or `node .`

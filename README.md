@@ -17,21 +17,14 @@ Heres the discord server for you to join
 https://discord.gg/geoxor
 
 # Dashboard
-![Xornet Dashboard](https://cdn.discordapp.com/attachments/810834301704863744/855708458472570880/preview.png)
+![Xornet Dashboard](https://cdn.discordapp.com/attachments/806300597338767450/859424475706556456/xornet.png)
 
 # Installation 
 Make sure you have Node.js v14+
   1. Client: 
      1. `npm i` to install dependancies
-     2. Comment out these lines in vue.config.js
-        ```js
-        // public: "https://xornet.cloud",
-        // https: true,
-        // cert: fs.readFileSync("./cert.pem"),
-        // key: fs.readFileSync("./key.pem")
-        ```
-     3. `npm run serve` to run the client
-     4. Use firefox because chrome doesn't like storing cookies in localhost
+     2. `npm run serve` to run the client
+     3. Use firefox because chrome doesn't like storing cookies in localhost
   2. Reporter: 
      1. `npm i` to install dependancies
      2. `nodemon .` or `node .`

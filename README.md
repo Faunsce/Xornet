@@ -1,7 +1,7 @@
 ![Xornet Logo](https://cdn.discordapp.com/attachments/851974319370010655/854669456793534494/unknown.png)
 
 # The Stack
-![Stack](https://cdn.discordapp.com/attachments/806300597338767450/858944068016144424/unknown.png)
+![Stack](https://cdn.discordapp.com/attachments/806300597338767450/860977347631775774/unknown.png)
  - Vue.js: We use Vue for our front-end framework!
  - Vite: We use Vite because it lets us quickly inspect our changes!
  - Windi: We use Windi to make our lifes easier when it comes to writing CSS!

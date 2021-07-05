@@ -4,3 +4,6 @@ reporter/settings.json
 reporter/speedtest.exe
 
 *.env
+client/vue.config.js
+xornet_client.bat
+xornet_server.bat

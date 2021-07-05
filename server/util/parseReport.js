@@ -24,11 +24,16 @@ function parseReport(report, latestVersion, machinesPings) {
   } catch (error) {
     report.rogue = true;
 
-    Logs.add("Report parser", "Got invalid Report from reporter", {
-      error: error.message,
-      stack: error.stack,
-      report,
-    }, report.linked_account);
+    Logs.add(
+      "Report parser",
+      "Got invalid Report from reporter",
+      {
+        error: error.message,
+        stack: error.stack,
+        report,
+      },
+      report.linked_account
+    );
 
     // // Log this in the database
     // if (!process.env.TESTING === "true")
@@ -126,7 +131,7 @@ function validate(report, latestVersion) {
   isNotEmpty(report.reporterVersion);
   versionIsValid(report.reporterVersion, latestVersion);
 
-  // Validate ram
+  // Validate RAM
   isValidNumber(report.ram.used);
   isValidNumber(report.ram.total);
   isValidNumber(report.ram.free);
@@ -138,7 +143,14 @@ function validate(report, latestVersion) {
   isValidNumber(report.cpu);
   isNotNegative(report.cpu);
 
-  // Validate netowkr
+  // Validate cores
+  report.cores?.forEach(core => {
+    isValidNumber(core);
+    isNotNegative(core);
+    isNotAbove100(core);
+  })
+
+  // Validate network
   isValidObject(report.network);
   isValidNumber(report.network.TxSec);
   isNotNegative(report.network.TxSec);
@@ -253,6 +265,10 @@ function isValidNumber(value) {
 
 function isNotNegative(value) {
   if (value < 0) throw new Error(`"${value}" is a Negative value`);
+}
+
+function isNotAbove100(value) {
+  if (value > 100) throw new Error(`"${value}" is above 100`);
 }
 
 function isValidBoolean(value) {

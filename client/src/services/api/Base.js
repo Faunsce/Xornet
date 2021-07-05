@@ -1,4 +1,6 @@
 import axios from "axios";
+import eventHandler from "@/services/eventHandler";
+import { appState } from "@/states/appState";
 let ROOT_PATH = "https://backend.xornet.cloud";
 
 /**
@@ -12,6 +14,13 @@ let ROOT_PATH = "https://backend.xornet.cloud";
  * @private
  */
 export default class Base {
+  constructor(){
+    this.token = localStorage.getItem('token');
+  }
+  setToken(token){
+    this.token = token;
+    localStorage.setItem('token', token);
+  }
   /**
    * Custom log function with API suffix
    * @param {string} method The API endpoint
@@ -38,7 +47,7 @@ export default class Base {
    * @private
    */
   error(method, ...messages) {
-    eventHandler.emit("show", { method, messages, type:"error" });
+    eventHandler.emit("show", { method, messages, type: "error" });
 
     // prettier-ignore
     console.log(
@@ -77,20 +86,20 @@ export default class Base {
     else this.error(method, response);
   }
 
-   /**
+  /**
    * Gets the geolocation of the client
    * @private
    * @returns {object} object
    */
-    async getGeolocation() {
-      const location = (await axios.get(`https://ipwhois.app/json/`)).data;
-      const geolocation = {
-        location: location.country,
-        countryCode: location.country_code,
-        isp: location.isp
-      };
-      return geolocation;
-    }
+  async getGeolocation() {
+    const location = (await axios.get(`https://ipwhois.app/json/`)).data;
+    const geolocation = {
+      location: location.country,
+      countryCode: location.country_code,
+      isp: location.isp
+    };
+    return geolocation;
+  }
 
   /**
    * Creates a backend URL with the provided paramaters
@@ -107,8 +116,9 @@ export default class Base {
    * Caches the user's properties in the local storage so the site knows how to style different pages based on who the user is
    * @param {object} userObject the me object u get from a request from the backend
    */
-  updateLocalStorage(userObject){
+  updateLocalStorage(userObject) {
     localStorage.setItem("me", JSON.stringify(userObject));
+    appState.setMe(userObject);
   }
 
   /**
@@ -117,7 +127,7 @@ export default class Base {
    * @param {string} route The route you wanna make a request to e.g. channels/pin
    * @param {object} headers An optional headers object to send to the route
    * @param {object} body An optional body object to send to the route
-   * @example 
+   * @example
    * const response = await super.request("get", `datacenter/${datacenter}`);
    * const response = await super.request("put", `datacenter/${datacenter}/user/${user.toLowerCase()}`);
    * const response = await super.request("post", `datacenter/new`, { "Content-Type": "application/json" }, form);
@@ -126,19 +136,16 @@ export default class Base {
    * @author Geoxor
    */
   async request(method, route, headers, body) {
+    headers = {
+      ...headers,
+      'Authorization': `Bearer ${this.token}`
+    };
+
     if (method === "get" || method === "delete") {
-      var response = await axios[method](
-        this.constructEndpoint(route),
-        body || {
-          withCredentials: true,
-          headers
-        }
-      ).catch(error => this.logError(`${method.toUpperCase()} ${route}`, error));
-    } else {
-      var response = await axios[method](this.constructEndpoint(route), body || undefined, {
-        withCredentials: true,
-        headers
-      }).catch(error => this.logError(`${method.toUpperCase()} ${route}`, error));
+      var response = await axios[method](this.constructEndpoint(route), {headers}).catch(error => this.logError(`${method.toUpperCase()} ${route}`, error));
+    }
+    else {
+      var response = await axios[method](this.constructEndpoint(route), body, {headers}).catch(error => this.logError(`${method.toUpperCase()} ${route}`, error));
     }
 
     this.logResponse(`${method.toUpperCase()} ${route}`, response);

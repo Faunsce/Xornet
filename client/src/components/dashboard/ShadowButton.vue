@@ -1,6 +1,6 @@
 <template>
   <div
-    class="shadowButton py-2 px-3 flex items-center h-min border border-bg-alpha-0 select-none cursor-pointer justify-between gap-2 flex-row rounded-full duration-100 bg-gray-400"
+    class="shadowButton py-1.5 px-2.5 flex items-center h-min border border-alpha-0 select-none cursor-pointer justify-between gap-2 flex-row rounded-full duration-100 bg-gray-300"
     :id="allowCopy ? 'shadowButton' : null"
     :class="{ colored, didCopy, iconOnly: !title, tiny }"
     @click="allowCopy ? copyText() : null"
@@ -128,5 +128,4 @@ export default {
   border: 1px solid #d00000;
   background-color: #d0000044;
 }
-
 </style>

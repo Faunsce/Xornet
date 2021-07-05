@@ -1,25 +1,40 @@
 <template>
-  <nav class="buttons bg-gray-200 h-full items-center flex flex-col content-between relative">
-    <div class="top">
+  <nav class="buttons bg-gray-300 h-full max-w-min items-center flex flex-col content-between relative">
+    <Tooltip side="right" text="Profile">
       <SquareButton boxless class="firstButton" icon="user" :to="{ name: 'profile', params: { username } }" />
-      <!-- <SquareButton icon="dashboard" :to="{ name: 'summary' }" /> -->
-      <SquareButton boxless icon="stack" :to="{ name: 'machines' }" />
+    </Tooltip>
+
+    <Tooltip side="right" text="Machines">
+      <SquareButton boxless icon="stack" :to="{ name: 'machines', params: { view: 'all' } }" />
+    </Tooltip>
+
+    <Tooltip side="right" text="Datacenters">
       <SquareButton boxless icon="datacenter" :to="{ name: 'datacenters' }" />
-      <!-- <SquareButton icon="network" :to="{ name: 'network' }" /> -->
+    </Tooltip>
+
+    <Tooltip side="right" text="Logs">
       <SquareButton boxless icon="clipboard" :to="{ name: 'logs' }" />
+    </Tooltip>
+
+    <Tooltip side="right" text="Downloads">
       <SquareButton boxless icon="downloads" :to="{ name: 'downloads' }" />
+    </Tooltip>
+
+    <Tooltip side="right" text="Settings">
       <SquareButton boxless class="settings" icon="settings" :to="{ name: 'settings' }" />
-    </div>
+    </Tooltip>
   </nav>
 </template>
 
 <script>
 import SquareButton from "@/components/dashboard/SquareButton";
+import Tooltip from "@/components/dashboard/Tooltip.vue";
 
 export default {
   name: "MobileNav",
   components: {
-    SquareButton
+    SquareButton,
+    Tooltip
   },
   computed: {
     username() {

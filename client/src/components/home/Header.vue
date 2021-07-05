@@ -20,7 +20,7 @@
         <Icon icon="downloads" />
         <p>Downloads</p>
       </router-link>
-      <router-link class="button" v-if="isLoggedIn" :to="{ name: 'machines' }">
+      <router-link class="button" v-if="isLoggedIn" :to="{ name: 'machines', params: { view: 'all' } }">
         <Icon icon="dashboard" />
         <p>Dashboard</p>
       </router-link>
@@ -108,14 +108,5 @@ header.view-login {
   font-size: 13px;
   line-height: 175%;
   white-space: nowrap;
-}
-
-@media only screen and (max-width: 768px) {
-  header.view-home {
-    padding: 8px;
-  }
-  .button p {
-    display: none;
-  }
 }
 </style>

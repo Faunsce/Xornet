@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import auth from "@/router/middleware/auth.js";
 
 const routes = [
-  // Xornet Home Page
   {
     path: "/:info?",
     name: "home",
@@ -11,7 +10,6 @@ const routes = [
       title: "Xornet | Home"
     }
   },
-  // Xornet Login
   {
     path: "/login",
     name: "login",
@@ -21,7 +19,6 @@ const routes = [
       guest: true
     }
   },
-  // Xornet Signup
   {
     path: "/signup",
     name: "signup",
@@ -31,7 +28,6 @@ const routes = [
       guest: true
     }
   },
-  // Xornet Downloads
   {
     path: "/downloads",
     name: "downloads",
@@ -44,11 +40,10 @@ const routes = [
     path: "/privacy",
     name: "privacy",
     component: () => import(/* webpackChunkName: "privacy" */ "@/views/home/Privacy.vue"),
-    meta: { 
+    meta: {
       title: "Xornet | Privacy"
     }
   },
-  // Xornet Dashboard
   {
     path: "/dashboard",
     name: "dashboard",
@@ -58,15 +53,6 @@ const routes = [
       requiresAuth: true
     },
     children: [
-      {
-        path: "summary",
-        name: "summary",
-        component: () => import(/* webpackChunkName: "summary" */ "@/views/dashboard/Summary.vue"),
-        meta: {
-          title: "Xornet | Summary"
-        }
-      },
-      // Xornet Signup
       {
         path: "datacenters/:name?",
         name: "datacenters",
@@ -85,15 +71,7 @@ const routes = [
         }
       },
       {
-        path: "network",
-        name: "network",
-        component: () => import(/* webpackChunkName: "network" */ "@/views/dashboard/Network.vue"),
-        meta: {
-          title: "Xornet | Network"
-        }
-      },
-      {
-        path: "machines",
+        path: "machines/:view",
         name: "machines",
         component: () => import(/* webpackChunkName: "machines" */ "@/views/dashboard/Machines.vue"),
         meta: {
@@ -101,19 +79,11 @@ const routes = [
         }
       },
       {
-        path: "machines/:machine",
+        path: "machines/machine/:machine/:view",
         name: "machine",
         component: () => import(/* webpackChunkName: "machine" */ "@/views/dashboard/Machine.vue"),
         meta: {
           title: "Xornet | Machine"
-        }
-      },
-      {
-        path: "machines/:machine?/specs",
-        name: "specs",
-        component: () => import(/* webpackChunkName: "specs" */ "@/views/dashboard/Specs.vue"),
-        meta: {
-          title: "Xornet | Machine Specification"
         }
       },
       {
@@ -127,7 +97,7 @@ const routes = [
       {
         path: "settings",
         name: "settings",
-        component: () => import(/* webpackChunkName: "profile" */ "@/views/dashboard/Settings.vue"),
+        component: () => import(/* webpackChunkName: "settings" */ "@/views/dashboard/Settings.vue"),
         meta: {
           title: "Xornet | Settings"
         }

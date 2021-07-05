@@ -15,7 +15,7 @@
 
       <h1 class="text-2xl font-bold">The Xornet Reporter easily lets you connect your computer to the platform</h1>
 
-      <p>The reporter uses the NodeJS runtime enviroment and is compiled to run natively on most common operating systems</p>
+      <p>The reporter uses the NodeJS runtime enviroment and Rust, it is compiled to run natively on most common operating systems</p>
 
       <img
         class="previewImage hidden md:flex absolute h-465px w-auto right-10vw z-0"
@@ -136,7 +136,7 @@ export default {
 
 <style lang="postcss">
 .lists li {
-  @apply list-disc list-inside text-left text-sm leading-relaxed;
+  @apply list-disc list-inside  text-sm leading-relaxed;
 }
 .downloadContent *:not(.previewImage) {
   @apply z-20;
@@ -166,12 +166,12 @@ export default {
 .downloads * {
   color: white;
   font-family: "Tomorrow", sans-serif;
-  @apply leading-normal text-left font-normal;
+  @apply leading-normal  font-normal;
 }
 
 .cockBlock * {
   font-family: Roboto Mono;
-  @apply font-bold text-sm font-semibold text-left;
+  @apply font-bold text-sm font-semibold;
 }
 
 .downloadArea > .platform > h1 {

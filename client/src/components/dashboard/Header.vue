@@ -1,5 +1,5 @@
 <template>
-  <header class="h-12 w-full flex z-400 items-start justify-between bg-gray-200 overflow-visible">
+  <header class="h-12 w-full flex z-20 items-start justify-between bg-gray-300 overflow-visible">
     <div class="left flex h-full w-full items-end">
       <div v-if="!showSearchBar && searchToggled" @click="searchToggled = false">
         <SquareButton icon="left-arrow" alt="" />
@@ -10,13 +10,18 @@
         :class="{ clickable: !isNestedRoute }"
         @click="isNestedRoute ? incrementSuperclass() : $router.go(-1)"
       >
-        <img class="transition duration-100 ease hover:w-10 active:w-8" v-if="isNestedRoute" :src="require('@/assets/logos/logoHeader.svg')" alt="Xornet" />
+        <img
+          class="transition duration-100 ease hover:w-10 active:w-8"
+          v-if="isNestedRoute"
+          :src="require('@/assets/logos/logoHeader.svg')"
+          alt="Xornet"
+        />
         <Icon v-else icon="left-arrow" style="width: 24px; filter: invert(1);" />
       </div>
 
       <div class="buttons items-center flex overflow-hidden" v-if="!searchToggled">
         <SquareButton icon="repository" href="https://github.com/Geoxor/Xornet/releases" />
-        <SquareButton icon="darkmode" @click="toggleDarkmode" />
+        <!-- <SquareButton icon="darkmode" @click="toggleDarkmode" /> -->
         <!-- <SquareButton icon="details" v-if="currentRoute == 'machines'" @click="isShowingDetails = !isShowingDetails" :isEnabled="isShowingDetails" /> -->
         <!-- <SquareButton icon="thick" v-if="currentRoute == 'machines' && thinButtons"/> -->
         <!-- <SquareButton icon="thin" v-if="currentRoute == 'machines' && !thinButtons"/> -->
@@ -28,13 +33,13 @@
     <div class="account flex items-center content-center" v-if="!searchToggled">
       <SquareButton icon="logout" @click.native="logout" />
 
-      <router-link class="w-8 h-8 m-2" :to="{ name: 'profile', params: { username } }">
+      <router-link class="w-8 h-8 max-w-8 max-h-8 m-2" :to="{ name: 'profile', params: { username } }">
         <img
           :src="
             profile?.profileImage?.url ??
               'https://cdn.discordapp.com/attachments/816028632269979668/855437868825444372/unknown.png'
           "
-          class="profileImage select-none object-cover cursor-pointer rounded-lg"
+          class="profileImage select-none object-cover cursor-pointer rounded-lg w-8 h-8"
           alt="profileImage"
         />
       </router-link>
@@ -47,6 +52,7 @@ import { isDark } from "@/services/theme.js";
 import SquareButton from "@/components/dashboard/SquareButton";
 import SearchBar from "@/components/dashboard/SearchBar";
 import Icon from "@/components/misc/Icon";
+import { appState } from "@/states/appState";
 
 export default {
   name: "Header",
@@ -74,7 +80,7 @@ export default {
     };
   },
   async created() {
-    this.profile = await this.api.user.fetchMe();
+    this.profile = appState.getMe();
     this.currentRoute = this.$route.name;
     this.showSearchBar = this.windowWidth > 460;
   },
@@ -124,6 +130,6 @@ export default {
 
 <style lang="postcss" scoped>
 .clickable {
-  @apply cursor-pointer
+  @apply cursor-pointer;
 }
 </style>

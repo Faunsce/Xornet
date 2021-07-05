@@ -1,12 +1,13 @@
 <template>
-  <div class="main">
+  <div class="main bg-gray-200 color-white">
     <img :src="require('@/assets/logos/logoColored.svg')" alt="Xornet" />
 
     <div class="textFields">
       <section>
         <h1>Our Goal</h1>
         <p>
-          We are XORNET this is a fun little project started by Geoxor for people who have servers and wanna be able to manage them remotely<br />
+          We are XORNET this is a fun little project started by Geoxor for people who have servers and wanna be able to manage
+          them remotely<br />
           Our goal is to make a platform for people to manage their servers!<br />
           <br />
         </p>
@@ -104,7 +105,6 @@ section h1 {
   z-index: 2;
   font-style: normal;
   font-weight: bold;
-  color: var(--white);
 }
 
 section p {
@@ -114,7 +114,6 @@ section p {
   text-align: left;
   vertical-align: top;
   max-width: 900px;
-  color: var(--white);
   letter-spacing: -4%;
 }
 
@@ -158,14 +157,5 @@ section p {
   z-index: 1;
   background: #151527;
   transform: rotate(-4.71deg) translateX(-25vw);
-}
-
-@media only screen and (max-width: 768px) {
-  section h1 {
-    font-size: 32px;
-  }
-  .textField h1 {
-    font-size: 32px;
-  }
 }
 </style>

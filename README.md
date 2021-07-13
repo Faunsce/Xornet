@@ -23,14 +23,14 @@ https://discord.gg/geoxor
 Make sure you have Node.js v14+
   1. Client: 
      1. `npm i` to install dependancies
-     2. `npm run serve` to run the client
-     3. Use firefox because chrome doesn't like storing cookies in localhost
+     2. `npm run dev` to run locally (assuming you're running the backend locally as well)
+     2. `npm run staged` to use the xornet backend if you're only planning on working on the front end
   2. Reporter: 
      1. `npm i` to install dependancies
-     2. `nodemon .` or `node .`
+     2. `npm run dev` to run locally (assuming you're running the backend locally as well)
   3. Server:
      1. `npm i` to install dependancies
-     2. `nodemon .` or `node .`
+     2. `npm run dev` to run locally (prod is only for the master server)
 
 # Information for pull requests
 Theres some scripts you should run before doing pull requests
@@ -58,4 +58,4 @@ The decompiled reporter can be ran using node.js at least on:
   - HiveOS
   
 # Disclaimer
-We don't know how to code, if you don't like it, its your fault for not committing.
+We don't know how to code, so don't be mean to us owo.

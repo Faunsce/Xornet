@@ -24,10 +24,11 @@ Make sure you have Node.js v14+
   1. Client: 
      1. `npm i` to install dependancies
      2. `npm run dev` to run locally (assuming you're running the backend locally as well)
-     2. `npm run staged` to use the xornet backend if you're only planning on working on the front end
+     3. `npm run staged` to use the xornet backend if you're only planning on working on the front end
   2. Reporter: 
      1. `npm i` to install dependancies
      2. `npm run dev` to run locally (assuming you're running the backend locally as well)
+     4. `npm run staged` to make the reporter connect to the backend instead of your local backend
   3. Server:
      1. `npm i` to install dependancies
      2. `npm run dev` to run locally (prod is only for the master server)

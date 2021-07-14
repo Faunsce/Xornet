@@ -29,6 +29,16 @@ Make sure you have Node.js v14+
      1. `npm i` to install dependancies
      2. `npm run dev` to run locally (assuming you're running the backend locally as well)
      4. `npm run staged` to make the reporter connect to the backend instead of your local backend
+     
+     Important: to compile the reporters you need to do something really stupid since one of the packages
+     has a bug with its imports that conflicts with the compiler we use (pkg)
+     
+     You have to make a node_modules folder in node_modules/pkg
+     and copy paste these folders from node_modules into node_modules/pkg
+     ![image](https://user-images.githubusercontent.com/34042825/125646206-5ecc4332-81b1-4d98-8f24-c84d595a60e1.png)
+
+     I'll probably make a script in package.json later that will temporarely put this in there and delete it
+     after its done compiling but for now thats what you need to do
   3. Server:
      1. `npm i` to install dependancies
      2. `npm run dev` to run locally (prod is only for the master server)
